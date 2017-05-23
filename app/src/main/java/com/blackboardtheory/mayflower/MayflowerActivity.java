@@ -23,8 +23,8 @@ import android.support.v7.app.AppCompatActivity;
 /**
  * MayflowerActivity.class
  *
- * Monolithic Activity class that relies on a {@link Navigator} object for navigation through
- * fragments.
+ * Monolithic Activity class that relies on a {@link Conductor} object for navigation through
+ * Screen objects
  */
 public abstract class MayflowerActivity extends AppCompatActivity {
 
@@ -41,34 +41,33 @@ public abstract class MayflowerActivity extends AppCompatActivity {
     }
 
     /**
-     * We attempt to re-init our {@link Navigator} object on each resume, in case it has been
+     * We attempt to re-init our {@link Conductor} object on each resume, in case it has been
      * destroyed. If it has not been destroyed, it will use the current instance rather than
      * recreating it.
      */
     @Override
     public void onResume() {
         super.onResume();
-        Navigator.init(this, getNavigatorContainer(), getInitialNode());
+        Conductor.init(this, getConductorContainer(), getEntryScreen());
     }
 
     /**
-     * We have to destroy our {@link Navigator} when the activity is destroyed, otherwise we will get
-     * bad references when we attempt to recreate
+     * We have to destroy our {@link Conductor} Conductor when the activity is destroyed, otherwise
+     * we will get bad references when we attempt to recreate
      */
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Navigator.getInstance().setDestroyed();
+        Conductor.getInstance().destroy();
     }
 
     /**
      * Method to return the container ID responsible for housing the
-     * {@link com.blackboardtheory.mayflower.Navigator.FragmentNode} objects we will navigate
-     * through
+     * {@link Screen} objects through which we will navigate
      *
      * @return Root container ID for the application
      */
-    protected int getNavigatorContainer() {
+    protected int getConductorContainer() {
         return R.id.mayflower_root_container;
     }
 
@@ -82,10 +81,9 @@ public abstract class MayflowerActivity extends AppCompatActivity {
     }
 
     /**
-     * Return the root {@link com.blackboardtheory.mayflower.Navigator.FragmentNode} node
-     * for the application
+     * Return the root {@link Screen} Screen for the application
      *
-     * @return {@link com.blackboardtheory.mayflower.Navigator.FragmentNode} the initial Node
+     * @return {@link Screen} the initial Screen
      */
-    public abstract Navigator.FragmentNode getInitialNode();
+    protected abstract Screen getEntryScreen();
 }

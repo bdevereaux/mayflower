@@ -25,6 +25,7 @@ import android.support.v4.app.FragmentManager;
  *
  * The Navigator class aims to simplify Fragment navigation
  */
+@Deprecated
 public class Navigator {
 
     private static Navigator instance;
@@ -107,6 +108,7 @@ public class Navigator {
     /**
      * Our wrapper class for maintaining {@link Fragment} objects and their navigation state
      */
+    @Deprecated
     public static class FragmentNode {
         public Fragment current;
         public String tag;
