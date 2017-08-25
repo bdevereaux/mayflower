@@ -1,35 +1,58 @@
 package com.blackboardtheory.mayflower;
 
-import android.content.Context;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 
 /**
- * Created by bdevereaux3 on 5/25/17.
+ * Created by bdevereaux3 on 8/21/17.
  */
 
-public abstract class Screen<T extends Contract.ViewContract> implements Contract.PresenterContract{
+public abstract class Screen<T extends InteractionContract> {
 
-    protected T vContract;
-    private String title;
-    private ScreenFragment fragment;
+    public final static String CONTRACT_NAME = "ICONTRACT";
+    public final static String BAD_SCREEN_MESSAGE = "All Screens must declare an interface named 'ICONTRACT' that extends from InteractionContract";
+    public final static String BAD_CONTROLLER_MESSAGE = "The Controller coupled to this Screen must implement the ICONTRACT declared by this Screen";
 
-    public Screen(T vContract, Context context, String title) {
-        this.vContract = vContract;
-        this.title = title;
-        fragment = new ScreenFragment();
-        fragment.setView(createView(context));
+    private boolean isValid;
+    private InteractionContract iContract;
+
+    public Screen() {
+        try {
+            performInteractionContractDeclarationCheck();
+            isValid = true;
+        } catch(BadScreenException e) {
+            Log.e("MayflowerException", e.getMessage());
+        }
     }
 
+    protected abstract View setupView(LayoutInflater inflater);
 
-    public ScreenFragment getFragment() {
-        return this.fragment;
+    private void performInteractionContractDeclarationCheck() throws BadScreenException {
+        Class<?>[] classes = getClass().getDeclaredClasses();
+        String expectedInterfaceName = getClass().getName().concat("$").concat(CONTRACT_NAME);
+        Class<?> expectedInterface = null;
+        for(Class<?> clazz : classes) {
+            if(expectedInterfaceName.equals(clazz.getName())) {
+                expectedInterface = clazz;
+                break;
+            }
+        }
+        if(null == expectedInterface || !InteractionContract.class.isAssignableFrom(expectedInterface)) {
+            throw new BadScreenException(BAD_SCREEN_MESSAGE);
+        }
     }
 
-    public String getTitle() {
-        return this.title;
+    boolean isValid() {
+        return isValid;
     }
 
-    @Override
-    public String getPresenterContractTitle() {
-        return getClass().getName();
+    void setIContract(InteractionContract iContract) {
+        this.iContract = iContract;
     }
+
+    protected T getIContract() {
+        return (T)iContract;
+    }
+
 }
